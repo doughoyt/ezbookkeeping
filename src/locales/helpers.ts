@@ -110,9 +110,7 @@ import {
     isObject,
     isString,
     isNumber,
-    isBoolean,
-    copyObjectTo,
-    copyArrayTo
+    isBoolean
 } from '@/lib/common.ts';
 
 import {
@@ -171,6 +169,7 @@ export interface LocalizedError {
 
 export function getI18nOptions(): object {
     return {
+        legacy: false,
         locale: DEFAULT_LANGUAGE,
         fallbackLocale: DEFAULT_LANGUAGE,
         formatFallbackMessages: true,
@@ -990,11 +989,11 @@ export function useI18n() {
             let defaultCategories: PresetCategory[] = [];
 
             if (categoryType === CategoryType.Income) {
-                defaultCategories = copyArrayTo(DEFAULT_INCOME_CATEGORIES, []);
+                defaultCategories = DEFAULT_INCOME_CATEGORIES;
             } else if (categoryType === CategoryType.Expense) {
-                defaultCategories = copyArrayTo(DEFAULT_EXPENSE_CATEGORIES, []);
+                defaultCategories = DEFAULT_EXPENSE_CATEGORIES;
             } else if (categoryType === CategoryType.Transfer) {
-                defaultCategories = copyArrayTo(DEFAULT_TRANSFER_CATEGORIES, []);
+                defaultCategories = DEFAULT_TRANSFER_CATEGORIES;
             }
 
             for (let j = 0; j < defaultCategories.length; j++) {
@@ -1470,7 +1469,7 @@ export function useI18n() {
         const ret: CategorizedAccountWithDisplayBalance[] = [];
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         const allCategories = AccountCategory.values();
-        const categorizedAccounts: Record<number, CategorizedAccount> = copyObjectTo(getCategorizedAccountsMap(allVisibleAccounts), {}) as Record<number, CategorizedAccount>;
+        const categorizedAccounts: Record<number, CategorizedAccount> = getCategorizedAccountsMap(Account.cloneAccounts(allVisibleAccounts));
 
         for (let i = 0; i < allCategories.length; i++) {
             const category = allCategories[i];

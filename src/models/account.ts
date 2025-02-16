@@ -18,10 +18,11 @@ export class Account implements AccountInfoResponse {
     public comment: string;
     public creditCardStatementDate?: number;
     public displayOrder: number;
-    public isAsset?: boolean;
-    public isLiability?: boolean;
     public visible: boolean;
     public subAccounts?: Account[];
+
+    private readonly _isAsset?: boolean;
+    private readonly _isLiability?: boolean;
 
     protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, balance: number, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
         this.id = id;
@@ -38,14 +39,42 @@ export class Account implements AccountInfoResponse {
         this.displayOrder = displayOrder;
         this.visible = visible;
         this.creditCardStatementDate = creditCardStatementDate;
-        this.isAsset = isAsset;
-        this.isLiability = isLiability;
+        this._isAsset = isAsset;
+        this._isLiability = isLiability;
 
         if (typeof(subAccounts) !== 'undefined') {
             this.subAccounts = subAccounts;
         } else {
             this.subAccounts = undefined;
         }
+    }
+
+    public get isAsset(): boolean {
+        if (typeof(this._isAsset) !== 'undefined') {
+            return this._isAsset;
+        }
+
+        const accountCategory = AccountCategory.valueOf(this.category);
+
+        if (accountCategory) {
+            return accountCategory.isAsset;
+        }
+
+        return false;
+    }
+
+    public get isLiability(): boolean {
+        if (typeof(this._isLiability) !== 'undefined') {
+            return this._isLiability;
+        }
+
+        const accountCategory = AccountCategory.valueOf(this.category);
+
+        if (accountCategory) {
+            return accountCategory.isLiability;
+        }
+
+        return false;
     }
 
     public get hidden(): boolean {
@@ -206,6 +235,27 @@ export class Account implements AccountInfoResponse {
         return subAccountCurrencies;
     }
 
+    public clone(): Account {
+        return new Account(
+            this.id,
+            this.name,
+            this.parentId,
+            this.category,
+            this.type,
+            this.icon,
+            this.color,
+            this.currency,
+            this.balance,
+            this.comment,
+            this.displayOrder,
+            this.visible,
+            this.balanceTime,
+            this.creditCardStatementDate,
+            this.isAsset,
+            this.isLiability,
+            typeof(this.subAccounts) !== 'undefined' ? Account.cloneAccounts(this.subAccounts) : undefined);
+    }
+
     public createNewSubAccount(currency: string, balanceTime: number): Account {
         return new Account(
             '', // id
@@ -286,6 +336,16 @@ export class Account implements AccountInfoResponse {
         return defaultName;
     }
 
+    public static cloneAccounts(accounts: Account[]): Account[] {
+        const clonedAccounts: Account[] = [];
+
+        for (const account of accounts) {
+            clonedAccounts.push(account.clone());
+        }
+
+        return clonedAccounts;
+    }
+
     public static sortAccounts(accounts: Account[]): Account[] {
         if (!accounts || !accounts.length) {
             return accounts;
@@ -315,25 +375,25 @@ export class Account implements AccountInfoResponse {
 export class AccountWithDisplayBalance extends Account {
     public displayBalance: string;
 
-    private constructor(Account: Account, displayBalance: string) {
+    private constructor(account: Account, displayBalance: string) {
         super(
-            Account.id,
-            Account.name,
-            Account.parentId,
-            Account.category,
-            Account.type,
-            Account.icon,
-            Account.color,
-            Account.currency,
-            Account.balance,
-            Account.comment,
-            Account.displayOrder,
-            Account.visible,
-            Account.balanceTime,
-            Account.creditCardStatementDate,
-            Account.isAsset,
-            Account.isLiability,
-            Account.subAccounts
+            account.id,
+            account.name,
+            account.parentId,
+            account.category,
+            account.type,
+            account.icon,
+            account.color,
+            account.currency,
+            account.balance,
+            account.comment,
+            account.displayOrder,
+            account.visible,
+            account.balanceTime,
+            account.creditCardStatementDate,
+            account.isAsset,
+            account.isLiability,
+            account.subAccounts
         );
 
         this.displayBalance = displayBalance;

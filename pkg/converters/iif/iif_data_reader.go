@@ -129,11 +129,26 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 				}
 			} else if lastLineSign == iifTransactionLineSignColumnName || lastLineSign == iifTransactionSplitLineSignColumnName {
 				if items[0] == iifTransactionSplitLineSignColumnName {
+					if currentTransactionData == nil {
+						log.Errorf(ctx, "[iif_data_reader.read] expected current transaction data is not nil, but read \"%s\"", items[0])
+						return nil, nil, errs.ErrInvalidIIFFile
+					}
+
 					currentTransactionData.splitData = append(currentTransactionData.splitData, &iifTransactionSplitData{
 						dataItems: items,
 					})
 					lastLineSign = items[0]
 				} else if items[0] == iifTransactionEndLineSignColumnName {
+					if currentTransactionData == nil {
+						log.Errorf(ctx, "[iif_data_reader.read] expected current transaction data is not nil, but read \"%s\"", items[0])
+						return nil, nil, errs.ErrInvalidIIFFile
+					}
+
+					if len(currentTransactionData.splitData) < 1 {
+						log.Errorf(ctx, "[iif_data_reader.read] expected reading transaction split line, but read \"%s\"", items[0])
+						return nil, nil, errs.ErrInvalidIIFFile
+					}
+
 					currentTransactionDataset.transactions = append(currentTransactionDataset.transactions, currentTransactionData)
 					lastLineSign = ""
 				} else {
@@ -214,7 +229,7 @@ func (r *iifDataReader) readTransactionSampleLines(ctx core.Context, items []str
 	}
 
 	if len(transactionEndSampleItems) < 1 || transactionEndSampleItems[0] != iifTransactionEndSampleLineSignColumnName {
-		log.Errorf(ctx, "[iif_data_reader.readTransactionSampleLines] expected reading transaction end sample line, but read \"%s\"", strings.Join(splitSampleItems, "\t"))
+		log.Errorf(ctx, "[iif_data_reader.readTransactionSampleLines] expected reading transaction end sample line, but read \"%s\"", strings.Join(transactionEndSampleItems, "\t"))
 		return nil, errs.ErrInvalidIIFFile
 	}
 
