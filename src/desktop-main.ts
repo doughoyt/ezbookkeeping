@@ -282,7 +282,7 @@ const vuetify = createVuetify({
             light: {
                 dark: false,
                 colors: {
-                    'primary': '#c67e48',
+                    'primary': '#14d7de',
                     'primary-darken-1': '#b67443',
                     'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
@@ -352,7 +352,7 @@ const vuetify = createVuetify({
             dark: {
                 dark: true,
                 colors: {
-                    'primary': '#c67e48',
+                    'primary': '#14d7de',
                     'primary-darken-1': '#b67443',
                     'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
