@@ -4,36 +4,35 @@
             <f7-nav-title :title="tt('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
-        <f7-card class="home-summary-card" :class="{ 'skeleton-text': loading }">
-            <f7-card-header class="display-block" style="padding-top: 120px;">
-                <p class="no-margin">
-                    <span class="card-header-content" v-if="loading">
-                        <span class="home-summary-month">Month</span>
-                        <span>·</span>
-                        <small>Expense</small>
-                    </span>
-                    <span class="card-header-content" v-else-if="!loading">
-                        <span class="home-summary-month">{{ displayDateRange?.thisMonth?.displayTime }}</span>
-                        <span>·</span>
-                        <small>{{ tt('Expense') }}</small>
-                    </span>
-                </p>
-                <p class="no-margin">
-                    <span class="month-expense" v-if="loading">0.00 USD</span>
-                    <span class="month-expense" v-else-if="!loading">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}</span>
-                    <f7-link class="margin-left-half" @click="showAmountInHomePage = !showAmountInHomePage">
-                        <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
-                    </f7-link>
-                </p>
-                <p class="no-margin">
-                    <small class="home-summary-misc" v-if="loading">Monthly income 0.00 USD</small>
-                    <small class="home-summary-misc" v-else-if="!loading">
-                        <span>{{ tt('Monthly income') }}</span>
-                        <span>{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
-                    </small>
-                </p>
-            </f7-card-header>
-        </f7-card>
+        <f7-card-header class="home-summary-card" :class="{ 'skeleton-text': loading }">
+            <f7-card class="account-overview-card" :class="{ 'skeleton-text': loading }">
+                <f7-card-header class="display-block" style="padding-top: 120px;">
+                    <p class="no-margin">
+                        <small class="card-header-content" v-if="loading">Net assets</small>
+                        <small class="card-header-content" v-else-if="!loading">{{ tt('Net assets') }}</small>
+                    </p>
+                    <p class="no-margin">
+                        <span class="net-assets" v-if="loading">0.00 USD</span>
+                        <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
+                        <f7-link class="margin-left-half" @click="showAmountInHomePage = !showAmountInHomePage">
+                            <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
+                        </f7-link>
+                    </p>
+                    <p class="no-margin">
+                        <small class="account-overview-info" v-if="loading">
+                            <span>Total assets | Total liabilities</span>
+                        </small>
+                        <small class="account-overview-info" v-else-if="!loading">
+                            <span>{{ tt('Total assets') }}</span>
+                            <span>{{ totalAssets }}</span>
+                            <span>|</span>
+                            <span>{{ tt('Total liabilities') }}</span>
+                            <span>{{ totalLiabilities }}</span>
+                        </small>
+                    </p>
+                </f7-card-header>
+            </f7-card>
+        </f7-card-header>
 
         <f7-list strong inset dividers class="margin-top overview-transaction-list" :class="{ 'skeleton-text': loading }">
             <f7-list-item :link="'/transaction/list?dateType=' + DateRange.Today.type" chevron-center>
@@ -223,6 +222,9 @@ const {
     showAmountInHomePage,
     displayDateRange,
     transactionOverview,
+    netAssets,
+    totalAssets,
+    totalLiabilities,
     getDisplayIncomeAmount,
     getDisplayExpenseAmount
 } = useHomePageBase();
