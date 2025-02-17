@@ -52,7 +52,7 @@ export default defineConfig(() => {
                     name: 'ezBookkeeping',
                     short_name: 'ezBookkeeping',
                     description: 'A lightweight personal bookkeeping app hosted by yourself.',
-                    theme_color: '#14d7de',
+                    theme_color: '#74bbfb',
                     background_color: '#F6F7F8',
                     start_url: './',
                     scope: './',
