@@ -197,6 +197,7 @@ import { useHomePageBase } from '@/views/base/HomePageBase.ts';
 
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
+import { useAccountsStore } from '@/stores/account.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 import { TemplateType } from '@/core/template.ts';
@@ -220,6 +221,8 @@ const transactionTemplatesStore = useTransactionTemplatesStore();
 const overviewStore = useOverviewStore();
 
 const loading = ref<boolean>(true);
+const loadingError = ref<unknown | null>(null);
+const accountsStore = useAccountsStore();
 const showTransactionTemplatePopover = ref<boolean>(false);
 
 const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
@@ -249,6 +252,19 @@ function init(): void {
             }
         });
 
+        accountsStore.loadAllAccounts({
+            force: false
+        }).then(() => {
+            loading.value = false;
+        }).catch(error => {
+            if (error.processed) {
+                loading.value = false;
+            } else {
+                loadingError.value = error;
+                showToast(error.message || error);
+            }
+        });
+                
         transactionTemplatesStore.loadAllTemplates({
             templateType: TemplateType.Normal.type,
             force: false
