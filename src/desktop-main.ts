@@ -282,8 +282,8 @@ const vuetify = createVuetify({
             light: {
                 dark: false,
                 colors: {
-                    'primary': '#74bbfb',
-                    'primary-darken-1': '#0780ee',
+                    'primary': '#0046aa',
+                    'primary-darken-1': '#00347f',
                     'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
                     'secondary-darken-1': '#545659',
@@ -352,8 +352,8 @@ const vuetify = createVuetify({
             dark: {
                 dark: true,
                 colors: {
-                    'primary': '#74bbfb',
-                    'primary-darken-1': '#0780ee',
+                    'primary': '#0046aa',
+                    'primary-darken-1': '#00347f',
                     'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
                     'secondary-darken-1': '#545659',
