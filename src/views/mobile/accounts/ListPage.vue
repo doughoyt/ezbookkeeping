@@ -28,11 +28,14 @@
                         <span>Total assets | Total liabilities</span>
                     </small>
                     <small class="account-overview-info" v-else-if="!loading">
-                        <span>{{ tt('Total assets') }}</span>
-                        <span>{{ totalAssets }}</span>
-                        <span>|</span>
-                        <span>{{ tt('Total liabilities') }}</span>
-                        <span>{{ totalLiabilities }}</span>
+                        <div>
+                            <span>{{ tt('Total assets') }}</span>
+                            <span>{{ totalAssets }}</span>
+                        </div>
+                        <div>
+                            <span>{{ tt('Total liabilities') }}</span>
+                            <span>{{ totalLiabilities }}</span>
+                        </div>
                     </small>
                 </p>
             </f7-card-header>
