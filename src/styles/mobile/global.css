@@ -227,11 +227,11 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 /** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
-    --dp-primary-color: #74bbfb;
+    --dp-primary-color: #0046aa;
 }
 
 .dp__theme_dark {
-    --dp-primary-color: #74bbfb;
+    --dp-primary-color: #0046aa;
 }
 
 /** Common class for replacing the default style of framework7 **/

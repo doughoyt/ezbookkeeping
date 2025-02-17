@@ -9,26 +9,15 @@
                 <f7-card-header class="display-block" style="padding-top: 120px;">
                     <p class="no-margin">
                         <small class="card-header-content" v-if="loading">Net assets</small>
-                        <small class="card-header-content" v-else-if="!loading">{{ tt('Net assets') }}</small>
+                        <!-- <small class="card-header-content" v-else-if="!loading">{{ tt('Net assets') }}</small> -->
+                        <small class="card-header-content" v-else-if="!loading">Outstanding Balance</small>
                     </p>
                     <p class="no-margin">
                         <span class="net-assets" v-if="loading">0.00 USD</span>
-                        <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
+                        <span class="net-assets" v-else-if="!loading">{{ totalLiabilities }}</span>
                         <f7-link class="margin-left-half" @click="showAmountInHomePage = !showAmountInHomePage">
                             <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                         </f7-link>
-                    </p>
-                    <p class="no-margin">
-                        <small class="account-overview-info" v-if="loading">
-                            <span>Total assets | Total liabilities</span>
-                        </small>
-                        <small class="account-overview-info" v-else-if="!loading">
-                            <span>{{ tt('Total assets') }}</span>
-                            <span>{{ totalAssets }}</span>
-                            <span>|</span>
-                            <span>{{ tt('Total liabilities') }}</span>
-                            <span>{{ totalLiabilities }}</span>
-                        </small>
                     </p>
                 </f7-card-header>
             </f7-card>
@@ -222,8 +211,6 @@ const {
     showAmountInHomePage,
     displayDateRange,
     transactionOverview,
-    netAssets,
-    totalAssets,
     totalLiabilities,
     getDisplayIncomeAmount,
     getDisplayExpenseAmount
