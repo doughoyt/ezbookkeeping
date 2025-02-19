@@ -418,6 +418,9 @@ export default {
     modifyTransaction: (req: TransactionModifyRequest): ApiResponsePromise<TransactionInfoResponse> => {
         return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/modify.json', req);
     },
+    clearTransaction: (req: TransactionModifyRequest): ApiResponsePromise<TransactionInfoResponse> => {
+        return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/clear.json', req);
+    },
     deleteTransaction: (req: TransactionDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/delete.json', req);
     },

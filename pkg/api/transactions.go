@@ -875,6 +875,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		Amount:            transactionModifyReq.SourceAmount,
 		HideAmount:        transactionModifyReq.HideAmount,
 		Comment:           transactionModifyReq.Comment,
+		Cleared:           transaction.Cleared,
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
@@ -971,6 +972,29 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	newTransactionResp.Pictures = a.GetTransactionPictureInfoResponseList(newPictureInfos)
 
 	return newTransactionResp, nil
+}
+
+// TransactionClearHandler toggles the Cleared flag on an existin transaction by request parameters for current user
+func (a *TransactionsApi) TransactionClearHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionClearReq models.TransactionClearRequest
+	err := c.ShouldBindJSON(&transactionClearReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionClearHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+
+	err = a.transactions.ClearTransaction(c, uid, transactionClearReq.Id, transactionClearReq.Cleared)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionClearHandler] failed to clear/unclear transaction \"id:%d\" for user \"uid:%d\", because %s", transactionClearReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[transactions.TransactionClearHandler] user \"uid:%d\" has cleared/uncleared transaction \"id:%d\"", uid, transactionClearReq.Id)
+	return true, nil
 }
 
 // TransactionDeleteHandler deletes an existed transaction by request parameters for current user

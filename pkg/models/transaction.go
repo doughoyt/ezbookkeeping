@@ -100,6 +100,7 @@ type Transaction struct {
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
 	DeletedUnixTime      int64
+	Cleared              bool
 }
 
 // TransactionGeoLocationRequest represents all parameters of transaction geographic location info update request
@@ -238,6 +239,12 @@ type TransactionGetRequest struct {
 	TrimTag      bool  `form:"trim_tag"`
 }
 
+// TransactionCVlearRequest represents all parameters of transaction clearing/unclearing request
+type TransactionClearRequest struct {
+	Id           int64  `json:"id,string" binding:"required,min=1"`
+	Cleared      bool   `json:"cleared"`
+}
+
 // TransactionDeleteRequest represents all parameters of transaction deleting request
 type TransactionDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`
@@ -277,6 +284,7 @@ type TransactionInfoResponse struct {
 	Comment              string                                   `json:"comment"`
 	GeoLocation          *TransactionGeoLocationResponse          `json:"geoLocation,omitempty"`
 	Editable             bool                                     `json:"editable"`
+	Cleared              bool                                     `json:"cleared"`
 }
 
 // TransactionCountResponse represents transaction count response
@@ -408,6 +416,7 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		Comment:              t.Comment,
 		GeoLocation:          geoLocation,
 		Editable:             editable,
+		Cleared:              t.Cleared,
 	}
 }
 

@@ -985,6 +985,13 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 	return nil
 }
 
+
+// ClearTransaction sets cleared flag (true or false) on an existing transaction from database
+func (s *TransactionService) ClearTransaction(c core.Context, uid int64, transactionId int64, cleared bool) error {
+
+	return nil
+}
+
 // DeleteTransaction deletes an existed transaction from database
 func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transactionId int64) error {
 	if uid <= 0 {
