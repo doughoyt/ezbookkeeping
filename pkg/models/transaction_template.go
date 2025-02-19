@@ -220,6 +220,7 @@ func (t *TransactionTemplate) toTransactionInfoResponse(utcOffset int16) *Transa
 		Comment:              t.Comment,
 		GeoLocation:          nil,
 		Editable:             true,
+		Cleared:              false,
 	}
 }
 
