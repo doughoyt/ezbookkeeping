@@ -489,6 +489,10 @@ export interface TransactionModifyRequest {
     readonly geoLocation?: TransactionGeoLocationRequest;
 }
 
+export interface TransactionToggleRequest {
+    readonly id: string;
+}
+
 export interface TransactionDeleteRequest {
     readonly id: string;
 }

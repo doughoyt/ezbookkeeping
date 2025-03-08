@@ -70,10 +70,6 @@
                                 v-model="category.comment"
                             />
                         </v-col>
-                        <v-col class="py-0" cols="12" md="12" v-if="editCategoryId">
-                            <v-switch :disabled="loading || submitting"
-                                      :label="tt('Visible')" v-model="category.visible"/>
-                        </v-col>
                     </v-row>
                 </v-form>
             </v-card-text>

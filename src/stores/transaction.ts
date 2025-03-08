@@ -1056,6 +1056,33 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
+    function toggleClearedTransaction({ transaction }: { transaction: Transaction }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.toggleClearedTransaction({
+                id: transaction.id
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to toggle this transaction' });
+                    return;
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to toggle transaction', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to toggle this transaction' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function parseImportDsvFile({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): Promise<string[][]> {
         return new Promise((resolve, reject) => {
             services.parseImportDsvFile({ fileType, fileEncoding, importFile }).then(response => {
@@ -1080,6 +1107,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
             });
         });
     }
+
 
     function parseImportTransaction({ fileType, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, geoSeparator, tagSeparator }: { fileType: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, geoSeparator?: string, tagSeparator?: string }): Promise<ImportTransactionResponsePageWrapper> {
         return new Promise((resolve, reject) => {
@@ -1241,6 +1269,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         saveTransaction,
         deleteTransaction,
         parseImportDsvFile,
+        toggleClearedTransaction,
         parseImportTransaction,
         importTransactions,
         uploadTransactionPicture,

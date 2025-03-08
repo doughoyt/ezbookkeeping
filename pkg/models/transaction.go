@@ -239,10 +239,9 @@ type TransactionGetRequest struct {
 	TrimTag      bool  `form:"trim_tag"`
 }
 
-// TransactionCVlearRequest represents all parameters of transaction clearing/unclearing request
-type TransactionClearRequest struct {
+// TransactionToggleRequest represents all parameters of transaction clearing/unclearing request
+type TransactionToggleRequest struct {
 	Id           int64  `json:"id,string" binding:"required,min=1"`
-	Cleared      bool   `json:"cleared"`
 }
 
 // TransactionDeleteRequest represents all parameters of transaction deleting request

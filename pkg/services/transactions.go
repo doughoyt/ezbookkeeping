@@ -998,8 +998,10 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 }
 
 
-// ClearTransaction sets cleared flag (true or false) on an existing transaction from database
-func (s *TransactionService) ClearTransaction(c core.Context, uid int64, transactionId int64, cleared bool) error {
+// ToggleTransaction toggles cleared flag (true or false) on an existing transaction from database
+func (s *TransactionService) ToggleTransaction(c core.Context, uid int64, transactionId int64) error {
+	// TODO: Actually toggle
+	log.Infof(c, "[transactions.ToggleTransaction] should toggle transaction %d.", transactionId)
 
 	return nil
 }
