@@ -977,26 +977,26 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	return newTransactionResp, nil
 }
 
-// TransactionClearHandler toggles the Cleared flag on an existin transaction by request parameters for current user
-func (a *TransactionsApi) TransactionClearHandler(c *core.WebContext) (any, *errs.Error) {
-	var transactionClearReq models.TransactionClearRequest
-	err := c.ShouldBindJSON(&transactionClearReq)
+// TransactionToggleHandler toggles the Cleared flag on an existin transaction by request parameters for current user
+func (a *TransactionsApi) TransactionToggleHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionToggleReq models.TransactionToggleRequest
+	err := c.ShouldBindJSON(&transactionToggleReq)
 
 	if err != nil {
-		log.Warnf(c, "[transactions.TransactionClearHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionToggleHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	uid := c.GetCurrentUid()
 
-	err = a.transactions.ClearTransaction(c, uid, transactionClearReq.Id, transactionClearReq.Cleared)
+	err = a.transactions.ToggleTransaction(c, uid, transactionToggleReq.Id)
 
 	if err != nil {
-		log.Errorf(c, "[transactions.TransactionClearHandler] failed to clear/unclear transaction \"id:%d\" for user \"uid:%d\", because %s", transactionClearReq.Id, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionToggleHandler] failed to clear/unclear transaction \"id:%d\" for user \"uid:%d\", because %s", transactionToggleReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.Infof(c, "[transactions.TransactionClearHandler] user \"uid:%d\" has cleared/uncleared transaction \"id:%d\"", uid, transactionClearReq.Id)
+	log.Infof(c, "[transactions.TransactionToggleHandler] user \"uid:%d\" has cleared/uncleared transaction \"id:%d\"", uid, transactionToggleReq.Id)
 	return true, nil
 }
 
