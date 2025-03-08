@@ -116,35 +116,18 @@
                     <v-card-text>
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="languageTag"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="languageTitle"
-                                    :placeholder="languageTitle"
-                                    :items="allLanguages"
-                                    v-model="newProfile.language"
-                                />
+                                <language-select :disabled="loading || saving"
+                                                 :label="languageTitle"
+                                                 :placeholder="languageTitle"
+                                                 :include-system-default="true"
+                                                 :use-model-value="true" v-model="newProfile.language" />
                             </v-col>
 
                             <v-col cols="12" md="6">
-                                <v-autocomplete
-                                    item-title="displayName"
-                                    item-value="currencyCode"
-                                    auto-select-first
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Default Currency')"
-                                    :placeholder="tt('Default Currency')"
-                                    :items="allCurrencies"
-                                    :no-data-text="tt('No results')"
-                                    v-model="newProfile.defaultCurrency"
-                                >
-                                    <template #append-inner>
-                                        <small class="text-field-append-text smaller">{{ newProfile.defaultCurrency }}</small>
-                                    </template>
-                                </v-autocomplete>
+                                <currency-select :disabled="loading || saving"
+                                                 :label="tt('Default Currency')"
+                                                 :placeholder="tt('Default Currency')"
+                                                 v-model="newProfile.defaultCurrency" />
                             </v-col>
 
                             <v-col cols="12" md="6">
@@ -366,8 +349,6 @@ const {
     loading,
     resending,
     saving,
-    allLanguages,
-    allCurrencies,
     allVisibleAccounts,
     allVisibleCategorizedAccounts,
     allWeekDays,

@@ -90,35 +90,19 @@
 
                                 <v-row>
                                     <v-col cols="12" md="12">
-                                        <v-select
-                                            item-title="displayName"
-                                            item-value="languageTag"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Language')"
-                                            :placeholder="tt('Language')"
-                                            :items="allLanguages"
-                                            v-model="currentLocale"
-                                        />
+                                        <language-select :disabled="submitting || navigateToHomePage"
+                                                         :label="languageTitle"
+                                                         :placeholder="languageTitle"
+                                                         :use-model-value="true" v-model="currentLocale" />
                                     </v-col>
                                 </v-row>
 
                                 <v-row>
                                     <v-col cols="12" md="6">
-                                        <v-autocomplete
-                                            item-title="displayName"
-                                            item-value="currencyCode"
-                                            auto-select-first
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Default Currency')"
-                                            :placeholder="tt('Default Currency')"
-                                            :items="allCurrencies"
-                                            :no-data-text="tt('No results')"
-                                            v-model="user.defaultCurrency"
-                                        >
-                                            <template #append-inner>
-                                                <small class="text-field-append-text smaller">{{ user.defaultCurrency }}</small>
-                                            </template>
-                                        </v-autocomplete>
+                                        <currency-select :disabled="submitting || navigateToHomePage"
+                                                         :label="tt('Default Currency')"
+                                                         :placeholder="tt('Default Currency')"
+                                                         v-model="user.defaultCurrency" />
                                     </v-col>
 
                                     <v-col cols="12" md="6">
@@ -146,22 +130,8 @@
                                                   v-model="usePresetCategories"/>
                                     </v-col>
                                     <v-col cols="12" sm="6" class="text-right-sm">
-                                        <v-menu location="bottom">
-                                            <template #activator="{ props }">
-                                                <v-btn variant="text"
-                                                       :disabled="submitting || navigateToHomePage"
-                                                       v-bind="props">{{ currentLanguageName }}</v-btn>
-                                            </template>
-                                            <v-list>
-                                                <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
-                                                    <v-list-item-title
-                                                        class="cursor-pointer"
-                                                        @click="currentLocale = lang.languageTag">
-                                                        {{ lang.displayName }}
-                                                    </v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
-                                        </v-menu>
+                                        <language-select-button :disabled="submitting || navigateToHomePage"
+                                                                :use-model-value="true" v-model="currentLocale" />
                                     </v-col>
                                 </v-row>
 
@@ -242,14 +212,12 @@ import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
 
 import { useRootStore } from '@/stores/index.ts';
 
 import type { PartialRecord, TypeAndDisplayName } from '@/core/base.ts';
-import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
@@ -268,13 +236,13 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const router = useRouter();
 const theme = useTheme();
 
-const { tt, getAllLanguageOptions, getAllCurrencies, getAllWeekDays, getAllTransactionDefaultCategories } = useI18n();
+const { tt, getAllWeekDays, getAllTransactionDefaultCategories } = useI18n();
 
 const {
     user,
     submitting,
+    languageTitle,
     currentLocale,
-    currentLanguageName,
     inputEmptyProblemMessage,
     inputInvalidProblemMessage,
     getCategoryTypeName,
@@ -290,8 +258,6 @@ const usePresetCategories = ref<boolean>(false);
 const finalResultMessage = ref<string | null>(null);
 const navigateToHomePage = ref<boolean>(false);
 
-const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
-const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
 const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(0, currentLocale.value));
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
