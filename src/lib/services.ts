@@ -3,12 +3,17 @@ import axios, { type AxiosRequestConfig, type AxiosRequestHeaders, type AxiosRes
 import type { ApiResponse } from '@/core/api.ts';
 
 import {
+    TransactionType
+} from '@/core/transaction.ts';
+
+import {
     BASE_API_URL_PATH,
     BASE_QRCODE_PATH,
     BASE_PROXY_URL_PATH,
     BASE_AMAP_API_PROXY_URL_PATH,
     DEFAULT_API_TIMEOUT,
     DEFAULT_UPLOAD_API_TIMEOUT,
+    DEFAULT_EXPORT_API_TIMEOUT,
     DEFAULT_IMPORT_API_TIMEOUT,
     GOOGLE_MAP_JAVASCRIPT_URL,
     BAIDU_MAP_JAVASCRIPT_URL,
@@ -43,6 +48,7 @@ import type {
 import type {
     TransactionCreateRequest,
     TransactionModifyRequest,
+    TransactionToggleRequest,
     TransactionDeleteRequest,
     TransactionImportRequest,
     TransactionListByMaxTimeRequest,
@@ -128,6 +134,7 @@ import {
 } from './server_settings.ts';
 import { getTimezoneOffsetMinutes } from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
+import { getBasePath } from './web.ts';
 
 interface ApiRequestConfig extends AxiosRequestConfig {
     readonly headers: AxiosRequestHeaders;
@@ -142,7 +149,7 @@ export type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;
 let needBlockRequest = false;
 const blockedRequests: ((token: string | undefined) => void)[] = [];
 
-axios.defaults.baseURL = BASE_API_URL_PATH;
+axios.defaults.baseURL = getBasePath() + BASE_API_URL_PATH;
 axios.defaults.timeout = DEFAULT_API_TIMEOUT;
 axios.interceptors.request.use((config: ApiRequestConfig) => {
     const token = getCurrentToken();
@@ -318,9 +325,13 @@ export default {
     },
     getExportedUserData: (fileType: string): Promise<AxiosResponse<BlobPart>> => {
         if (fileType === 'csv') {
-            return axios.get<BlobPart>('v1/data/export.csv');
+            return axios.get<BlobPart>('v1/data/export.csv', {
+                timeout: DEFAULT_EXPORT_API_TIMEOUT
+            } as ApiRequestConfig);
         } else if (fileType === 'tsv') {
-            return axios.get<BlobPart>('v1/data/export.tsv');
+            return axios.get<BlobPart>('v1/data/export.tsv', {
+                timeout: DEFAULT_EXPORT_API_TIMEOUT
+            } as ApiRequestConfig);
         } else {
             return Promise.reject('Parameter Invalid');
         }
@@ -418,13 +429,49 @@ export default {
     modifyTransaction: (req: TransactionModifyRequest): ApiResponsePromise<TransactionInfoResponse> => {
         return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/modify.json', req);
     },
+    toggleClearedTransaction: (req: TransactionToggleRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transactions/toggle.json', req);
+    },
     deleteTransaction: (req: TransactionDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/delete.json', req);
     },
-    parseImportTransaction: ({ fileType, importFile }: { fileType: string, importFile: File }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+    parseImportDsvFile: ({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): ApiResponsePromise<string[][]> => {
+        return axios.postForm<ApiResponse<string[][]>>('v1/transactions/parse_dsv_file.json', {
+            fileType: fileType,
+            fileEncoding: fileEncoding,
+            file: importFile
+        }, {
+            timeout: DEFAULT_UPLOAD_API_TIMEOUT
+        } as ApiRequestConfig);
+    },
+    parseImportTransaction: ({ fileType, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, geoSeparator, tagSeparator }: { fileType: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, geoSeparator?: string, tagSeparator?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+        let textualColumnMapping: string | undefined = undefined;
+        let textualTransactionTypeMapping: string | undefined = undefined;
+        let textualHasHeaderLine: string | undefined = undefined;
+
+        if (columnMapping) {
+            textualColumnMapping = JSON.stringify(columnMapping);
+        }
+
+        if (transactionTypeMapping) {
+            textualTransactionTypeMapping = JSON.stringify(transactionTypeMapping);
+        }
+
+        if (hasHeaderLine) {
+            textualHasHeaderLine = 'true';
+        }
+
         return axios.postForm<ApiResponse<ImportTransactionResponsePageWrapper>>('v1/transactions/parse_import.json', {
             fileType: fileType,
-            file: importFile
+            fileEncoding: fileEncoding,
+            file: importFile,
+            columnMapping: textualColumnMapping,
+            transactionTypeMapping: textualTransactionTypeMapping,
+            hasHeaderLine: textualHasHeaderLine,
+            timeFormat: timeFormat,
+            timezoneFormat: timezoneFormat,
+            geoSeparator: geoSeparator,
+            tagSeparator: tagSeparator
         }, {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         } as ApiRequestConfig);
@@ -518,11 +565,11 @@ export default {
         } as ApiRequestConfig);
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
-        return `${BASE_QRCODE_PATH}/${qrCodeName}.png`;
+        return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;
     },
     generateMapProxyTileImageUrl: (mapProvider: string, language: string): string => {
         const token = getCurrentToken();
-        let url = `${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${getBasePath()}${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -532,7 +579,7 @@ export default {
     },
     generateMapProxyAnnotationImageUrl: (mapProvider: string, language: string): string => {
         const token = getCurrentToken();
-        let url = `${BASE_PROXY_URL_PATH}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${getBasePath()}${BASE_PROXY_URL_PATH}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -556,7 +603,7 @@ export default {
         return `${AMAP_JAVASCRIPT_URL}&key=${getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
     },
     generateAmapApiInternalProxyUrl: (): string => {
-        return `${window.location.origin}${BASE_AMAP_API_PROXY_URL_PATH}`;
+        return `${window.location.origin}${getBasePath()}${BASE_AMAP_API_PROXY_URL_PATH}`;
     },
     getInternalAvatarUrlWithToken(avatarUrl: string, disableBrowserCache?: boolean | string): string {
         if (!avatarUrl) {

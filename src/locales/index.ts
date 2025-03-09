@@ -4,6 +4,7 @@ import es from './es.json';
 import vi from './vi.json';
 import zhHans from './zh_Hans.json';
 import de from './de.json';
+import ja from './ja.json';
 
 export interface LanguageInfo {
     readonly name: string;
@@ -16,6 +17,7 @@ export interface LanguageInfo {
 export interface LanguageOption {
     readonly languageTag: string;
     readonly displayName: string;
+    readonly nativeDisplayName: string;
 }
 
 export const DEFAULT_LANGUAGE: string = 'en';
@@ -40,6 +42,12 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'es',
         content: es
     },
+    'ja': {
+        name: 'Japanese',
+        displayName: '日本語',
+        alternativeLanguageTag: 'ja-JP',
+        content: ja
+    },
     'ru': {
         name: 'Russian',
         displayName: 'Русский',
@@ -53,8 +61,8 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         content: vi
     },
     'zh-Hans': {
-        name: 'Simplified Chinese',
-        displayName: '简体中文',
+        name: 'Chinese (Simplified)',
+        displayName: '中文 (简体)',
         alternativeLanguageTag: 'zh-CN',
         aliases: ['zh-CHS', 'zh-CN', 'zh-SG'],
         content: zhHans

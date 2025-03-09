@@ -25,6 +25,7 @@ export class Transaction implements TransactionInfoResponse {
     public tagIds: string[];
     public comment: string;
     public editable: boolean;
+    public cleared: boolean;
 
     private _pictures?: TransactionPicture[];
     private _geoLocation?: TransactionGeoLocation;
@@ -38,7 +39,7 @@ export class Transaction implements TransactionInfoResponse {
     private _day?: number = undefined; // only for displaying transaction in transaction list
     private _dayOfWeek?: string = undefined; // only for displaying transaction in transaction list
 
-    protected constructor(id: string, timeSequenceId: string, type: number, categoryId: string, time: number, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, tagIds: string[], comment: string, editable: boolean) {
+    protected constructor(id: string, timeSequenceId: string, type: number, categoryId: string, time: number, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, tagIds: string[], comment: string, editable: boolean, cleared: boolean) {
         this.id = id;
         this.timeSequenceId = timeSequenceId;
         this.type = type;
@@ -53,6 +54,7 @@ export class Transaction implements TransactionInfoResponse {
         this.tagIds = tagIds;
         this.comment = comment;
         this.editable = editable;
+        this.cleared = cleared;
         this.setCategoryId(categoryId);
     }
 
@@ -282,7 +284,8 @@ export class Transaction implements TransactionInfoResponse {
             false, // hideAmount
             [], // tagIds
             '', // comment
-            true // editable
+            true, // editable
+            false // cleared
         );
     }
 
@@ -302,7 +305,8 @@ export class Transaction implements TransactionInfoResponse {
             transactionResponse.hideAmount,
             transactionResponse.tagIds,
             transactionResponse.comment,
-            transactionResponse.editable
+            transactionResponse.editable,
+            transactionResponse.cleared,
         );
 
         if (transactionResponse.category) {
@@ -374,7 +378,8 @@ export class Transaction implements TransactionInfoResponse {
             transactionDraft.hideAmount ?? false, // hideAmount
             transactionDraft.tagIds ?? [], // tagIds
             transactionDraft.comment ?? '', // comment
-            true // editable
+            true, // editable
+            false // cleared
         );
 
         if (transactionDraft.pictures) {
@@ -484,6 +489,10 @@ export interface TransactionModifyRequest {
     readonly geoLocation?: TransactionGeoLocationRequest;
 }
 
+export interface TransactionToggleRequest {
+    readonly id: string;
+}
+
 export interface TransactionDeleteRequest {
     readonly id: string;
 }
@@ -546,6 +555,7 @@ export interface TransactionInfoResponse {
     readonly comment: string;
     readonly geoLocation?: TransactionGeoLocationResponse;
     readonly editable: boolean;
+    readonly cleared: boolean;
 }
 
 export interface TransactionStatisticRequest {

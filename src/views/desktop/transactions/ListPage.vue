@@ -449,6 +449,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
+                                            <th class="transaction-table-column-cleared">&nbsp;&#x2714;</th>
                                             <th class="transaction-table-column-description text-no-wrap">{{ tt('Description') }}</th>
                                         </tr>
                                         </thead>
@@ -472,7 +473,7 @@
                                                v-for="(transaction, idx) in transactions">
                                             <tr class="transaction-list-row-date no-hover text-sm"
                                                 v-if="idx === 0 || (idx > 0 && (transaction.date !== transactions[idx - 1].date))">
-                                                <td :colspan="showTagInTransactionListPage ? 6 : 5" class="font-weight-bold">
+                                                <td :colspan="showTagInTransactionListPage ? 7 : 6" class="font-weight-bold">
                                                     <div class="d-flex align-center">
                                                         <span>{{ getDisplayLongDate(transaction) }}</span>
                                                         <v-chip class="ml-1" color="default" size="x-small"
@@ -530,6 +531,9 @@
                                                     <v-chip class="transaction-tag" size="small"
                                                             :text="tt('None')"
                                                             v-if="!transaction.tagIds || !transaction.tagIds.length"/>
+                                                </td>
+                                                <td class="transaction-table-column-cleared" @click.stop="toggle(transaction)">
+                                                    <v-checkbox :readonly="true" :disabled="loading" v-model="transaction.cleared"/>
                                                 </td>
                                                 <td class="transaction-table-column-description text-truncate">
                                                     {{ transaction.comment }}
@@ -1391,6 +1395,23 @@ function show(transaction: Transaction): void {
     });
 }
 
+function toggle(transaction: Transaction): void {
+    transactionsStore.toggleClearedTransaction({
+            transaction: transaction as Transaction
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        reload(false);
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+
+}
+
 function scrollTimeMenuToSelectedItem(opened: boolean): void {
     if (opened) {
         scrollMenuToSelectedItem(timeFilterMenu.value);
@@ -1531,6 +1552,11 @@ init(props);
 .transaction-table .transaction-table-column-tags {
     width: 90px;
     max-width: 300px;
+}
+
+.transaction-table-column-cleared {
+    width: 80px;
+    text-align: center;
 }
 
 .transaction-table-column-description {

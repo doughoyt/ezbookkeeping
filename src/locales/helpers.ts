@@ -66,7 +66,8 @@ import {
 
 import {
     TransactionEditScopeType,
-    TransactionTagFilterType
+    TransactionTagFilterType,
+    ImportTransactionColumnType
 } from '@/core/transaction.ts';
 
 import {
@@ -85,6 +86,7 @@ import {
 import {
     type LocalizedImportFileType,
     type LocalizedImportFileTypeSubType,
+    type LocalizedImportFileTypeSupportedEncodings,
     type LocalizedImportFileDocument,
 } from '@/core/file.ts';
 
@@ -117,6 +119,7 @@ import {
     isPM,
     formatUnixTime,
     formatCurrentTime,
+    formatDate,
     parseDateFromUnixTime,
     getYear,
     getTimezoneOffset,
@@ -609,16 +612,13 @@ export function useI18n() {
             }
 
             const languageInfo = ALL_LANGUAGES[languageTag];
-            let displayName = languageInfo.displayName;
+            const displayName = languageInfo.displayName;
             const languageNameInCurrentLanguage = getLanguageDisplayName(languageInfo.name);
-
-            if (languageNameInCurrentLanguage && languageNameInCurrentLanguage !== displayName) {
-                displayName = `${languageNameInCurrentLanguage} (${displayName})`;
-            }
 
             ret.push({
                 languageTag: languageTag,
-                displayName: displayName
+                displayName: languageNameInCurrentLanguage,
+                nativeDisplayName: displayName
             });
         }
 
@@ -629,7 +629,8 @@ export function useI18n() {
         if (includeSystemDefault) {
             ret.splice(0, 0, {
                 languageTag: '',
-                displayName: t('System Default')
+                displayName: '',
+                nativeDisplayName: t('System Default')
             });
         }
 
@@ -1137,11 +1138,27 @@ export function useI18n() {
                 }
             }
 
+            const supportedEncodings: LocalizedImportFileTypeSupportedEncodings[] = [];
+
+            if (fileType.supportedEncodings) {
+                for (let i = 0; i < fileType.supportedEncodings.length; i++) {
+                    const encoding = fileType.supportedEncodings[i];
+                    const localizedEncoding: LocalizedImportFileTypeSupportedEncodings = {
+                        encoding: encoding,
+                        displayName: t(`encoding.${encoding}`)
+                    };
+
+                    supportedEncodings.push(localizedEncoding);
+                }
+            }
+
             const localizedFileType: LocalizedImportFileType = {
                 type: fileType.type,
                 displayName: t(fileType.name),
                 extensions: fileType.extensions,
                 subTypes: subTypes.length ? subTypes : undefined,
+                supportedEncodings: supportedEncodings.length ? supportedEncodings : undefined,
+                dataFromTextbox: fileType.dataFromTextbox,
                 document: document
             };
             allSupportedImportFileTypes.push(localizedFileType);
@@ -1295,6 +1312,10 @@ export function useI18n() {
 
     function isShortTimeMeridiemIndicatorFirst(): boolean {
         return getLocalizedDateTimeType(ShortTimeFormat.all(), ShortTimeFormat.values(), userStore.currentUserShortTimeFormat, 'shortTimeFormat', ShortTimeFormat.Default).isMeridiemIndicatorFirst || false;
+    }
+
+    function formatDateToLongDate(date: string): string {
+        return formatDate(date, getLocalizedLongDateFormat());
     }
 
     function formatYearQuarter(year: number, quarter: number): string {
@@ -1675,6 +1696,7 @@ export function useI18n() {
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
+        getAllImportTransactionColumnTypes: () => getLocalizedDisplayNameAndType(ImportTransactionColumnType.values()),
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
         getAllSupportedImportFileTypes,
@@ -1713,6 +1735,7 @@ export function useI18n() {
         formatUnixTimeToShortMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
+        formatDateToLongDate,
         formatYearQuarter,
         formatDateRange,
         getTimezoneDifferenceDisplayText,
