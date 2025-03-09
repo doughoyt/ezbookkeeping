@@ -1000,12 +1000,36 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 
 // ToggleTransaction toggles cleared flag (true or false) on an existing transaction from database
 func (s *TransactionService) ToggleTransaction(c core.Context, uid int64, transactionId int64) error {
-	// TODO: Actually toggle
-	log.Infof(c, "[transactions.ToggleTransaction] should toggle transaction %d.", transactionId)
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
 
-	return nil
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		oldTransaction := &models.Transaction{}
+		has, err := sess.ID(transactionId).Where("uid=?", uid).Get(oldTransaction)
+		
+		if err != nil {
+			return err
+		} else if !has {
+			return errs.ErrTransactionNotFound
+		}
+
+		toggleModel := &models.Transaction{
+			Cleared:  !oldTransaction.Cleared,
+		}
+
+		// Update transaction row to deleted
+		toggledRows, err := sess.ID(oldTransaction.TransactionId).Cols("cleared").Where("uid=?", uid).Update(toggleModel)
+		
+		if err != nil {
+			return err
+		} else if toggledRows < 1 {
+			return errs.ErrTransactionNotFound
+		}
+
+		return err
+	})
 }
-
 // DeleteTransaction deletes an existed transaction from database
 func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transactionId int64) error {
 	if uid <= 0 {

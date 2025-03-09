@@ -1396,10 +1396,20 @@ function show(transaction: Transaction): void {
 }
 
 function toggle(transaction: Transaction): void {
-    //transaction.cleared = !transaction.cleared;
-    console.log(transaction.cleared)
-    transactionsStore.toggleClearedTransaction(transaction as Transaction);
-    
+    transactionsStore.toggleClearedTransaction({
+            transaction: transaction as Transaction
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        reload(false);
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+
 }
 
 function scrollTimeMenuToSelectedItem(opened: boolean): void {
