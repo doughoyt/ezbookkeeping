@@ -27,6 +27,7 @@ func TestDefaultTransactionDataCSVFileConverterToExportedContent(t *testing.T) {
 		GeoLongitude:      123.45,
 		GeoLatitude:       45.67,
 		Comment:           "Hello,World",
+		Cleared:           true,
 	}
 	transactions[1] = &models.Transaction{
 		TransactionId:     2,
@@ -39,6 +40,7 @@ func TestDefaultTransactionDataCSVFileConverterToExportedContent(t *testing.T) {
 		GeoLongitude:      0,
 		GeoLatitude:       0,
 		Comment:           "Foo#Bar",
+		Cleared:           false,
 	}
 	transactions[2] = &models.Transaction{
 		TransactionId:        3,
@@ -115,10 +117,10 @@ func TestDefaultTransactionDataCSVFileConverterToExportedContent(t *testing.T) {
 	allTagIndexes[2] = []int64{3, 1, 4}
 	allTagIndexes[3] = []int64{2, 3}
 
-	expectedContent := "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n" +
-		"2024-09-01 12:34:56,+08:00,Income,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,123.450000 45.670000,Test Tag;Test Tag2,Hello World\n" +
-		"2024-09-01 12:34:56,+00:00,Expense,Test Category2,Test Sub Category2,Test Account,CNY,-0.10,,,,,Test Tag,Foo#Bar\n" +
-		"2024-09-01 12:34:56,-05:00,Transfer,Test Category3,Test Sub Category3,Test Account,CNY,123.45,Test Account2,USD,17.35,,Test Tag2,T\te s t test\n"
+	expectedContent := "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Cleared,Description\n" +
+		"2024-09-01 12:34:56,+08:00,Income,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,123.450000 45.670000,Test Tag;Test Tag2,C,Hello World\n" +
+		"2024-09-01 12:34:56,+00:00,Expense,Test Category2,Test Sub Category2,Test Account,CNY,-0.10,,,,,Test Tag,,Foo#Bar\n" +
+		"2024-09-01 12:34:56,-05:00,Transfer,Test Category3,Test Sub Category3,Test Account,CNY,123.45,Test Account2,USD,17.35,,Test Tag2,,T\te s t test\n"
 	actualContent, err := converter.ToExportedContent(context, 123, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
 
 	assert.Nil(t, err)

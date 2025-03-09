@@ -71,5 +71,6 @@ const (
 	TRANSACTION_DATA_TABLE_RELATED_AMOUNT           TransactionDataTableColumn = 11
 	TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION      TransactionDataTableColumn = 12
 	TRANSACTION_DATA_TABLE_TAGS                     TransactionDataTableColumn = 13
-	TRANSACTION_DATA_TABLE_DESCRIPTION              TransactionDataTableColumn = 14
+	TRANSACTION_DATA_TABLE_CLEARED                  TransactionDataTableColumn = 14
+	TRANSACTION_DATA_TABLE_DESCRIPTION              TransactionDataTableColumn = 15
 )
