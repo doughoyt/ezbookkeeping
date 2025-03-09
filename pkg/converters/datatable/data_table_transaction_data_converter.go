@@ -82,6 +82,7 @@ func (c *DataTableTransactionDataExporter) BuildExportedContent(ctx core.Context
 
 		dataRowMap[TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION] = c.getExportedGeographicLocation(transaction)
 		dataRowMap[TRANSACTION_DATA_TABLE_TAGS] = c.getExportedTags(dataTableBuilder, transaction.TransactionId, allTagIndexes, tagMap)
+		dataRowMap[TRANSACTION_DATA_TABLE_CLEARED] = c.getExportedClearedFlag(transaction)
 		dataRowMap[TRANSACTION_DATA_TABLE_DESCRIPTION] = dataTableBuilder.ReplaceDelimiters(transaction.Comment)
 
 		dataTableBuilder.AppendTransaction(dataRowMap)
@@ -190,6 +191,15 @@ func (c *DataTableTransactionDataExporter) getExportedTags(dataTableBuilder Tran
 
 	return dataTableBuilder.ReplaceDelimiters(ret.String())
 }
+
+func (c *DataTableTransactionDataExporter) getExportedClearedFlag(transaction *models.Transaction) string {
+	if transaction.Cleared {
+		return "C"
+	}
+
+	return ""
+}
+
 
 // ParseImportedData returns the imported transaction data
 func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable TransactionDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
