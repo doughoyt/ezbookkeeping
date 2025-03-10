@@ -201,7 +201,8 @@
                                             <div class="item-after">
                                                 <div class="transaction-amount" v-if="transaction.sourceAccount"
                                                      :class="{ 'text-expense': transaction.type === TransactionType.Expense, 'text-income': transaction.type === TransactionType.Income }">
-                                                    <span>{{ getDisplayAmount(transaction) }}</span>
+                                                     <span class="list-item-checked-icon" v-if="transaction.cleared">&nbsp;&nbsp;&nbsp;&#x2714;</span> 
+                                                     <span>{{ getDisplayAmount(transaction) }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -469,6 +470,22 @@
                               :title="tt('Multiple Tags')" @click="filterMultipleTags()" v-if="allAvailableTagsCount > 0">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds && queryAllFilterTagIdsCount > 1"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item group-title :title="tt('Cleared')" />
+                <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="tt('All')" @click="changeTagFilter('')">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="tt('Cleared')" @click="changeTagFilter('')">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="tt('Uncleared')" @click="changeTagFilter('')">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>
                     </template>
                 </f7-list-item>
 
