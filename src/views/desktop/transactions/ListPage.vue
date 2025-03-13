@@ -1421,6 +1421,23 @@ function toggle(transaction: Transaction): void {
 
 }
 
+function toggle(transaction: Transaction): void {
+    transactionsStore.toggleClearedTransaction({
+            transaction: transaction as Transaction
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        reload(false);
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+
+}
+
 function scrollTimeMenuToSelectedItem(opened: boolean): void {
     if (opened) {
         scrollMenuToSelectedItem(timeFilterMenu.value);
